@@ -55,9 +55,6 @@ class SweTrackScanner:
         interval = config.get(CONF_SCAN_INTERVAL, SCAN_INTERVAL)
         _LOGGER.info('Polling interval: %s', interval)
         self.see = see
-        # self.update = Throttle(interval)(self._update_info)
-        self._update_info()
-
         def update_interval(now):
             """Update all the hosts on every interval time."""
             try:
