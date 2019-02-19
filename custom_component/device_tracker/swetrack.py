@@ -6,11 +6,12 @@ device_tracker:
     username: <email>
     password: <password>
     scan_interval:
-      seconds: 30
+      minutes: 10
 For more details about this platform, please refer to the documentation at
 https://home-assistant.io/components/device_tracker.swetrack/
 """
 import logging
+import datetime
 from datetime import timedelta
 
 import voluptuous as vol
@@ -20,7 +21,7 @@ from homeassistant.const import CONF_USERNAME, CONF_PASSWORD, CONF_SCAN_INTERVAL
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.event import track_utc_time_change
 from homeassistant.util import slugify
-from homeassistant.util import Throttle
+from homeassistant.util import dt
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -54,12 +55,22 @@ class SweTrackScanner:
         interval = config.get(CONF_SCAN_INTERVAL, SCAN_INTERVAL)
         _LOGGER.info('Polling interval: %s', interval)
         self.see = see
+        # self.update = Throttle(interval)(self._update_info)
         self._update_info()
-        self.update = Throttle(interval)(self._update_info)
+
+        def update_interval(now):
+            """Update all the hosts on every interval time."""
+            try:
+                self._update_info()
+            finally:
+                hass.helpers.event.track_point_in_utc_time(
+                    update_interval, dt.utcnow() + interval)
+
+        update_interval(None)
 
     def _update_info(self, now=None) -> None:
         """Update the device info."""
-        _LOGGER.debug("Updating devices %s", now)
+        _LOGGER.info("Updating device info")
 
         # Update self.devices to collect new devices added
         # to the users account.
@@ -75,7 +86,8 @@ class SweTrackScanner:
             lon = tracker['longitude']
             entity_picture = 'http://{}'.format(tracker['PhotoLink'])
             attrs = {
-                'last_updated': tracker['lastupdate'],
+                'last_connected': tracker['lastupdate'],
+                'last_updated': datetime.datetime.now(),
                 'friendly_name': tracker['name'],
                 'entity_picture': entity_picture,
                 'id': tracker['id'],
