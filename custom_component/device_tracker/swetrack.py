@@ -81,7 +81,7 @@ class SweTrackScanner:
                 dev_id = tracker_id
             lat = tracker['latitude']
             lon = tracker['longitude']
-            entity_picture = 'http://{}'.format(tracker['PhotoLink'])
+            entity_picture = 'https://{}'.format(tracker['PhotoLink'])
             attrs = {
                 'last_connected': tracker['lastupdate'],
                 'last_updated': datetime.datetime.now(),
