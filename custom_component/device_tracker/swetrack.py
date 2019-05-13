@@ -25,7 +25,8 @@ from homeassistant.util import dt
 
 _LOGGER = logging.getLogger(__name__)
 
-REQUIREMENTS = ['https://github.com/binbin2000/pyswetrack/archive/master.zip#pyswetrack==0.1']
+# REQUIREMENTS = ['https://github.com/binbin2000/pyswetrack/archive/master.zip#pyswetrack==0.1']
+REQUIREMENTS = ['pyswetrack==0.1']
 
 SCAN_INTERVAL = timedelta(seconds=300)
 
